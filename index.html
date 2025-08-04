@@ -1,0 +1,350 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        a {
+            color: #1a0dab;
+            /* default blue in light mode */
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        body.dark a {
+            color: #60a5fa;
+            /* soft blue in dark mode */
+        }
+    </style>
+    <style>
+        :root {
+            --background-light: #fff;
+            --background-dark: #18181b;
+            --text-light: #18181b;
+            --text-dark: #f1f5f9;
+            --button-bg-light: #e2e8f0;
+            --button-bg-dark: #27272a;
+            --time-bg-light: #f0f0f0;
+            --time-bg-dark: #2d2d32;
+            --time-text-light: #18181b;
+            --time-text-dark: #f1f5f9;
+            --visitor-bg-light: #e7f4ff;
+            --visitor-bg-dark: #334155;
+            --visitor-text-light: #18181b;
+            --visitor-text-dark: #f1f5f9;
+        }
+
+        body {
+            background: var(--background-light);
+            color: var(--text-light);
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        body.dark {
+            background: var(--background-dark);
+            color: var(--text-dark);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--button-bg-light);
+            border: none;
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            z-index: 1000;
+        }
+
+        body.dark .theme-toggle {
+            background: var(--button-bg-dark);
+            color: var(--text-dark);
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: inherit;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 0;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-top: 10px;
+        }
+
+        h3 {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+
+        p {
+            margin: 6px 0;
+        }
+
+        ul {
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        .contact {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .job-title {
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .job-meta {
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 14px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        #count {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0;
+            font-size: 16px;
+            background-color: var(--visitor-bg-light);
+            color: var(--visitor-text-light);
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.08);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        body.dark #count {
+            background-color: var(--visitor-bg-dark);
+            color: var(--visitor-text-dark);
+        }
+
+        #uk-time {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            background-color: var(--time-bg-light);
+            color: var(--time-text-light);
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.08);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        body.dark #uk-time {
+            background-color: var(--time-bg-dark);
+            color: var(--time-text-dark);
+        }
+    </style>
+    <title>CHUNG YEUNG NG (Savio) - HTML Resume styled with CSS</title>
+</head>
+<script>
+    function setTheme(theme) {
+        document.body.classList.toggle('dark', theme === 'dark');
+        document.getElementById('themeToggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+    function getPreferredTheme() {
+        const stored = localStorage.getItem('theme');
+        if (stored) return stored;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    function toggleTheme() {
+        const current = document.body.classList.contains('dark') ? 'dark' : 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        setTheme(next);
+        localStorage.setItem('theme', next);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        setTheme(getPreferredTheme());
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    });
+</script>
+
+<body>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    <div class="top-bar">
+        <div id="uk-time"></div>
+        <div id="count">Loading...</div>
+    </div>
+    <script>
+        // Fancy UK Time Display
+        function updateUKTime() {
+            const ukTimeEl = document.getElementById('uk-time');
+            const now = new Date();
+            const ukTime = new Date(now.toLocaleString('en-GB', { timeZone: 'Europe/London' }));
+            const hours = String(ukTime.getHours()).padStart(2, '0');
+            const minutes = String(ukTime.getMinutes()).padStart(2, '0');
+            const seconds = String(ukTime.getSeconds()).padStart(2, '0');
+            const day = ukTime.toLocaleDateString('en-GB', { weekday: 'long' });
+            const date = ukTime.toLocaleDateString('en-GB');
+            ukTimeEl.textContent = `📅 ${day}, ${date} | 🕒 ${hours}:${minutes}:${seconds}`;
+        }
+        setInterval(updateUKTime, 1000);
+        updateUKTime();
+
+        // Visitor Counter using Azure Function and COSMOS DB to store the count
+        window.addEventListener("DOMContentLoaded", () => {
+            const el = document.getElementById("count");
+            if (!el) {
+                console.error("❌ Element with ID 'count' not found in the DOM.");
+                return;
+            }
+
+            fetch("https://resumevisitor-fn-dyb9dsguddgzdzge.uksouth-01.azurewebsites.net/api/updateCounter")
+                .then(response => {
+                    if (!response.ok) throw new Error("Network response was not ok");
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && typeof data.count === 'number') {
+                        el.textContent = "👤 Visitor #: " + data.count;
+                    } else {
+                        throw new Error("Invalid response format");
+                    }
+                })
+                .catch(err => {
+                    console.error("❌ Visitor count fetch failed:", err);
+                    if (el) el.textContent = "👤 Visitor #: N/A";
+                });
+        });
+    </script>
+
+    <h1 style="text-align: center; font-weight: bold;">CHUNG YEUNG NG (Savio)</h1>
+    <h1 style="text-align: center; font-weight: bold;">Cloud Engineer</h1>
+    <h3 style="text-align: center; font-weight: bold;">
+        <a href="https://github.com/saviong">github.com/saviong</a> |
+        <a href="mailto:yeungson@gmail.com">yeungson@gmail.com</a> |
+        <a href="https://www.linkedin.com/in/saviong">linkedin.com/in/saviong</a> |
+        London, UK
+    </h3>
+
+    <div class="section">
+        <h2><u>PROFESSIONAL SUMMARY</u></h2>
+        <p>A recently certified Azure Administrator Associate (AZ-104) with a strong foundation in process optimization,
+            data analysis, and systems management. Familiar with both Azure and AWS environments, combining a background
+            in scientific and business settings with newly acquired cloud skills to offer a unique perspective on
+            solving complex technical challenges. Eager to apply expertise in infrastructure as code, automation, and
+            multi-cloud services to build and maintain robust, scalable, and secure solutions.</p>
+    </div>
+
+    <div class="section">
+        <h2><u>CORE COMPETENCIES & TECHNICAL SKILLS</u></h2>
+        <p><strong>Cloud Platforms:</strong> Azure (IaaS, PaaS, Virtual Networks, Storage, Azure AD), AWS (EC2, S3, VPC,
+            IAM)</p>
+        <p><strong>DevOps & Automation:</strong> Terraform, Bicep, Docker, Kubernetes, PowerShell, Bash, Power Automate,
+            YAML, JSON</p>
+        <p><strong>Operating Systems:</strong> Windows, Linux, macOS</p>
+        <p><strong>Agile & Project Management:</strong> Agile (Scrum, Kanban), Jira, Confluence, Trello</p>
+        <p><strong>Core Competencies:</strong> Stakeholder Management, Process Automation, Data Analysis, Regulatory
+            Compliance (ISO standards), Problem-Solving, Project Coordination, Inventory & Asset Management</p>
+    </div>
+
+    <div class="section">
+        <h2><u>CERTIFICATIONS</u></h2>
+        <ul>
+            <li>AZ-104 Microsoft Certified: Azure Administrator Associate – Issued 20 Jun 2025</li>
+            <li>Professional Scrum Master™ I (PSM I) – Issued 21 Feb 2025</li>
+            <li>Atlassian Agile Project Management Professional Certificate – Issued 16 Feb 2025</li>
+            <li>Career Essentials in Business Analysis by Microsoft and LinkedIn – Issued 14 Mar 2025</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2><u>WORK EXPERIENCE</u></h2>
+
+        <p class="job-title">Laboratory Asset Coordinator</p>
+        <p class="job-meta">Anthony Nolan, London, UK | August 2021 - Present</p>
+        <ul>
+            <li>Oversaw end-to-end inventory management for laboratory consumables and assets, reducing stock shortages
+                by 20%.</li>
+            <li>Optimized order cycles via data analysis, cutting procurement costs by 10%.</li>
+            <li>Maintained 100% ISO15189 and ISO17025 compliance with accurate documentation.</li>
+            <li>Improved project turnaround time by 40% through better communication and meetings.</li>
+            <li>Coordinated 500+ equipment maintenance visits annually, reducing downtime by 50%.</li>
+        </ul>
+
+        <p class="job-title">Senior Business Development Officer</p>
+        <p class="job-meta">MediFast (Hong Kong) Ltd., Hong Kong | Aug 2020 - May 2021</p>
+        <ul>
+            <li>Mentored 3 colleagues, improving productivity by 20%.</li>
+            <li>Drove revenue from HK$5.5M to HK$7.7M in 2020.</li>
+            <li>Automated workflows via Excel VBA, reducing admin tasks by 80%.</li>
+        </ul>
+
+        <p class="job-title">Business Development Officer</p>
+        <p class="job-meta">MediFast (Hong Kong) Ltd., Hong Kong | Sept 2017 - Jul 2020</p>
+        <ul>
+            <li>Boosted revenue from HK$5M to HK$5.5M.</li>
+            <li>Uncovered 3 new market opportunities through data analysis.</li>
+            <li>Converted 85% of leads into long-term contracts.</li>
+        </ul>
+
+        <p class="job-title">Medical Sales Representative</p>
+        <p class="job-meta">DKSH Hong Kong Ltd., Hong Kong | May 2017 – Jul 2020</p>
+        <ul>
+            <li>Surpassed sales targets by 15% annually.</li>
+            <li>Expanded into 3 new segments, increasing visibility by 30%.</li>
+        </ul>
+
+        <p class="job-title">Sales Executive</p>
+        <p class="job-meta">World Ways Co. (HK) Ltd., Hong Kong | Sept 2014 – Feb 2017</p>
+        <ul>
+            <li>Increased annual sales by 10% consistently.</li>
+            <li>Reduced approval times by 20% via streamlined processes.</li>
+        </ul>
+
+        <p class="job-title">Laboratory Technician</p>
+        <p class="job-meta">ASB-Biodiesel (Hong Kong) Ltd., Hong Kong | Jul 2013 – Jul 2014</p>
+        <ul>
+            <li>Maintained 100% compliance in quality control.</li>
+            <li>Enhanced biodiesel production efficiency by 15%.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2><u>EDUCATION</u></h2>
+        <p><strong>Hong Kong University of Science and Technology</strong> – BSc (Hons) in Chemistry (2nd Class Honors),
+            2010 – 2013</p>
+        <p><strong>Technische Universität München</strong> – Summer Exchange, Nanoscience and Nanotechnology, Jun - Jul
+            2012</p>
+    </div>
+</body>
+
+</html>
