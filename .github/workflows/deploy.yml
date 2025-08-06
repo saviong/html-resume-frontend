@@ -17,19 +17,22 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Upload to Azure Blob
+    - name: Upload to Azure Blob Storage
       uses: azure/cli@v1
       with:
         inlineScript: |
-          echo "Uploading files to Azure Blob Storage..."
+          echo "Uploading all files to Azure Blob Storage..."
+          
+          # Upload all files (excluding git and github folders)
           az storage blob upload-batch \
             --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
             --destination '$web' \
             --source . \
             --auth-mode key \
             --account-key ${{ secrets.AZURE_STORAGE_KEY }} \
-            --overwrite true \
-            --pattern "*.html" "*.css" "*.js" "*.png" "*.jpg" "*.jpeg" "*.gif" "*.ico" "*.svg"
+            --overwrite true
+          
+          echo "✅ All files uploaded successfully!"
 
     - name: Purge Azure CDN
       uses: azure/cli@v1
@@ -43,12 +46,13 @@ jobs:
               --profile-name ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
               --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            echo "✅ CDN cache purged successfully!"
           else
-            echo "CDN configuration incomplete, skipping CDN purge"
-            echo "Required: AZURE_CDN_ENDPOINT, AZURE_CDN_PROFILE_NAME, AZURE_RESOURCE_GROUP, AZURE_SUBSCRIPTION_ID"
+            echo "ℹ️  CDN configuration incomplete, skipping CDN purge"
           fi
 
     - name: Display deployment info
       run: |
-        echo "✅ Deployment completed successfully!"
-        echo "📝 Files uploaded to: ${{ secrets.AZURE_STORAGE_ACCOUNT }}"
+        echo "🎉 Deployment completed successfully!"
+        echo "📝 Files uploaded to storage account: ${{ secrets.AZURE_STORAGE_ACCOUNT }}"
+        echo "🌐 Your resume should now be available at your static website URL"
