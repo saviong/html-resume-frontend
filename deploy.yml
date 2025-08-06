@@ -2,7 +2,7 @@ name: Deploy Frontend Resume to Azure Blob
 
 on:
   push:
-    branches: [master]  # or main if that’s your default
+    branches: [master]  # or main if that's your default
 
 jobs:
   deploy:
@@ -10,26 +10,49 @@ jobs:
 
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
+    - name: Azure Login with Service Principal
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      env:
+        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
 
     - name: Upload to Azure Blob
       uses: azure/cli@v1
       with:
         inlineScript: |
+          echo "Uploading files to Azure Blob Storage..."
           az storage blob upload-batch \
             --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
             --destination '$web' \
             --source . \
             --auth-mode key \
-            --account-key ${{ secrets.AZURE_STORAGE_KEY }}
+            --account-key ${{ secrets.AZURE_STORAGE_KEY }} \
+            --overwrite true \
+            --pattern "*.html" "*.css" "*.js" "*.png" "*.jpg" "*.jpeg" "*.gif" "*.ico" "*.svg"
 
     - name: Purge Azure CDN
       uses: azure/cli@v1
       with:
         inlineScript: |
-          az cdn endpoint purge \
-            --content-paths '/*' \
-            --name ${{ secrets.AZURE_CDN_ENDPOINT }} \
-            --profile-name ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          if [ -n "${{ secrets.AZURE_CDN_ENDPOINT }}" ] && [ -n "${{ secrets.AZURE_CDN_PROFILE_NAME }}" ] && [ -n "${{ secrets.AZURE_RESOURCE_GROUP }}" ] && [ -n "${{ secrets.AZURE_SUBSCRIPTION_ID }}" ]; then
+            echo "Purging CDN cache..."
+            az cdn endpoint purge \
+              --content-paths '/*' \
+              --name ${{ secrets.AZURE_CDN_ENDPOINT }} \
+              --profile-name ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
+              --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+              --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          else
+            echo "CDN configuration incomplete, skipping CDN purge"
+            echo "Required: AZURE_CDN_ENDPOINT, AZURE_CDN_PROFILE_NAME, AZURE_RESOURCE_GROUP, AZURE_SUBSCRIPTION_ID"
+          fi
+
+    - name: Display deployment info
+      run: |
+        echo "✅ Deployment completed successfully!"
+        echo "📝 Files uploaded to: ${{ secrets.AZURE_STORAGE_ACCOUNT }}"
