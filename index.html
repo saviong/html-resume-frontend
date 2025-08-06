@@ -227,21 +227,66 @@
                 return;
             }
 
-            fetch("https://resumevisitor-fn-dyb9dsguddgzdzge.uksouth-01.azurewebsites.net/api/updateCounter")
+            // Show loading state
+            el.textContent = "👤 Loading...";
+
+            const apiUrl = "https://resumevisitor-fn-dyb9dsguddgzdzge.uksouth-01.azurewebsites.net/api/updateCounter";
+
+            console.log("🚀 Fetching visitor count from:", apiUrl);
+
+            fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                mode: 'cors'
+            })
                 .then(response => {
-                    if (!response.ok) throw new Error("Network response was not ok");
+                    console.log("📡 Response status:", response.status);
+                    console.log("📡 Response headers:", [...response.headers.entries()]);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const contentType = response.headers.get("content-type");
+                    if (!contentType || !contentType.includes("application/json")) {
+                        throw new Error("Response is not JSON");
+                    }
+
                     return response.json();
                 })
                 .then(data => {
-                    if (data && typeof data.count === 'number') {
+                    console.log("✅ Received data:", data);
+
+                    if (data && (typeof data.count === 'number' || typeof data.count === 'string')) {
                         el.textContent = "👤 Visitor #: " + data.count;
+                        console.log("✅ Visitor count updated:", data.count);
                     } else {
-                        throw new Error("Invalid response format");
+                        throw new Error("Invalid response format: " + JSON.stringify(data));
                     }
                 })
                 .catch(err => {
                     console.error("❌ Visitor count fetch failed:", err);
-                    if (el) el.textContent = "👤 Visitor #: N/A";
+                    console.error("❌ Error details:", {
+                        message: err.message,
+                        stack: err.stack,
+                        name: err.name
+                    });
+
+                    if (el) {
+                        el.textContent = "👤 Visitor #: N/A";
+                    }
+
+                    // Try a simple test to see if the endpoint is reachable
+                    fetch(apiUrl.replace('/api/updateCounter', '/'), { method: 'HEAD' })
+                        .then(response => {
+                            console.log("🔍 Base URL test - Status:", response.status);
+                        })
+                        .catch(baseErr => {
+                            console.log("🔍 Base URL test failed:", baseErr.message);
+                        });
                 });
         });
     </script>
