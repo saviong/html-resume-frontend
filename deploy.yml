@@ -34,21 +34,13 @@ jobs:
           
           echo "✅ All files uploaded successfully!"
 
-    - name: Purge Azure CDN
-      uses: azure/cli@v1
-      with:
-        inlineScript: |
-          if [ -n "${{ secrets.AZURE_CDN_ENDPOINT }}" ] && [ -n "${{ secrets.AZURE_CDN_PROFILE_NAME }}" ] && [ -n "${{ secrets.AZURE_RESOURCE_GROUP }}" ] && [ -n "${{ secrets.AZURE_SUBSCRIPTION_ID }}" ]; then
-            echo "Purging CDN cache..."
-          az afd endpoint purge \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --profile-name ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
-            --endpoint-name ${{ secrets.AZURE_CDN_ENDPOINT }} \
-            --content-paths '/*'
-            echo "✅ CDN cache purged successfully!"
-          else
-            echo "ℹ️  CDN configuration incomplete, skipping CDN purge"
-          fi
+    - name: Purge Azure Front Door
+      run: |
+        az afd endpoint purge \
+          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --profile-name ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
+          --endpoint-name ${{ secrets.AZURE_CDN_ENDPOINT }} \
+          --content-paths '/*'
 
     - name: Display deployment info
       run: |
