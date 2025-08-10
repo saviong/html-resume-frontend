@@ -34,13 +34,18 @@ jobs:
           
           echo "✅ All files uploaded successfully!"
 
-    - name: Purge Azure Front Door
-      run: |
-        az afd endpoint purge \
-          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-          --profile-name ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
-          --endpoint-name ${{ secrets.AZURE_CDN_ENDPOINT }} \
-          --content-paths '/*'
+    - name: Purge Azure Front Door cache
+      uses: azure/cli@v1
+      with:
+        inlineScript: |
+          az extension add --name afd --only-show-errors || az extension update --name afd --only-show-errors
+
+          # Purge everything (fastest way to see updates)
+          az afd endpoint purge \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --profile-name  ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
+            --endpoint-name ${{ secrets.AZURE_CDN_ENDPOINT }} \
+            --content-paths '/*'
 
     - name: Display deployment info
       run: |
