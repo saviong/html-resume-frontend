@@ -38,13 +38,17 @@ jobs:
       uses: azure/cli@v1
       with:
         inlineScript: |
-          az extension add --name afd --only-show-errors || az extension update --name afd --only-show-errors
+          # Let the CLI auto-install missing extensions
+          az config set extension.use_dynamic_install=yes_without_prompt
 
-          # Purge everything (fastest way to see updates)
+          # Install/update the extension that exposes `az afd`
+          az extension add --name front-door --only-show-errors || az extension update --name front-door --only-show-errors
+
+          # Purge the AFD endpoint cache
           az afd endpoint purge \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --profile-name  ${{ secrets.AZURE_CDN_PROFILE_NAME }} \
-            --endpoint-name ${{ secrets.AZURE_CDN_ENDPOINT }} \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+            --profile-name  "${{ secrets.AZURE_CDN_PROFILE_NAME }}" \
+            --endpoint-name "${{ secrets.AZURE_CDN_ENDPOINT }}" \
             --content-paths '/*'
 
     - name: Display deployment info
