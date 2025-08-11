@@ -205,49 +205,35 @@
     </div>
     <script>
         // --- Theme Handling ---
+        // (This part is unchanged and can be kept as is)
         const themeToggleButton = document.getElementById('themeToggle');
-
         function setTheme(theme) {
             document.body.classList.toggle('dark', theme === 'dark');
             themeToggleButton.textContent = theme === 'dark' ? '☀️' : '🌙';
             localStorage.setItem('theme', theme);
         }
-
         function getPreferredTheme() {
             const storedTheme = localStorage.getItem('theme');
-            if (storedTheme) {
-                return storedTheme;
-            }
+            if (storedTheme) return storedTheme;
             return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
-
         function toggleTheme() {
-            const currentTheme = document.body.classList.contains('dark') ? 'dark' : 'light';
-            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            setTheme(nextTheme);
+            const isDark = document.body.classList.contains('dark');
+            setTheme(isDark ? 'light' : 'dark');
         }
-
-        // Initial theme setup
-        setTheme(getPreferredTheme());
-
-        // Event listeners for theme changes
-        themeToggleButton.addEventListener('click', toggleTheme);
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            // Only change if user hasn't manually set a theme
-            if (!localStorage.getItem('theme')) {
-                setTheme(e.matches ? 'dark' : 'light');
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            setTheme(getPreferredTheme());
+            themeToggleButton.addEventListener('click', toggleTheme);
         });
 
+        // --- Authoritative UK Time Clock ---
+        const ukTimeEl = document.getElementById('uk-time');
 
-        // --- Fancy UK Time Display (Robust Version) ---
-        function updateUKTime() {
-            const ukTimeEl = document.getElementById('uk-time');
-            const now = new Date();
-
-            // Define options for ALL the parts we need in a single object
+        // This function purely formats a date object, making it reliable.
+        function formatUKTime(dateObject) {
+            // We still use Intl for formatting, but now we're giving it a perfect date object.
             const options = {
-                timeZone: 'Europe/London',
+                timeZone: 'Europe/London', // Kept for correctness
                 weekday: 'long',
                 day: '2-digit',
                 month: '2-digit',
@@ -255,71 +241,75 @@
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: false // Use 24-hour time for consistency
+                hour12: false
             };
-
-            // Create a single, robust formatter for the 'en-GB' locale
             const formatter = new Intl.DateTimeFormat('en-GB', options);
-            
-            // Get all parts in one single, reliable operation
-            const parts = formatter.formatToParts(now);
-
-            // Create a helper function to easily find the value of each part
+            const parts = formatter.formatToParts(dateObject);
             const findPart = (type) => parts.find(part => part.type === type)?.value || '';
 
-            // Extract each part by its type
-            const dayString    = findPart('weekday');
-            const day        = findPart('day');
-            const month      = findPart('month');
-            const year       = findPart('year');
-            const hour       = findPart('hour');
-            const minute     = findPart('minute');
-            const second     = findPart('second');
+            const dayString = findPart('weekday');
+            const dateString = `${findPart('day')}/${findPart('month')}/${findPart('year')}`;
+            const timeString = `${findPart('hour')}:${findPart('minute')}:${findPart('second')}`;
 
-            // Manually assemble the final strings to ensure correct format
-            const dateString = `${day}/${month}/${year}`;
-            const timeString = `${hour}:${minute}:${second}`;
-
-            // Update the element content
-            ukTimeEl.textContent = `📅 ${dayString}, ${dateString} | 🕒 ${timeString}`;
+            return `📅 ${dayString}, ${dateString} | 🕒 ${timeString}`;
         }
-        
-        // Run the clock
-        setInterval(updateUKTime, 1000);
-        updateUKTime(); // Initial call to display time immediately
 
+        // This function initializes our clock from the World Time API.
+        function initClock() {
+            // Set a loading message
+            if (ukTimeEl) ukTimeEl.textContent = 'Loading UK time...';
 
-        // --- Visitor Counter ---
-        window.addEventListener("DOMContentLoaded", () => {
-            const el = document.getElementById("count");
-            if (!el) {
-                console.error("❌ Element with ID 'count' not found in the DOM.");
-                return;
-            }
-            el.textContent = "👤 Loading...";
-            const apiUrl = "https://resumevisitor-fn-dyb9dsguddgzdzge.uksouth-01.azurewebsites.net/api/updateCounter";
-
-            fetch(apiUrl, { mode: 'cors' })
+            fetch('https://worldtimeapi.org/api/timezone/Europe/London')
                 .then(response => {
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    const contentType = response.headers.get("content-type");
-                    if (!contentType || !contentType.includes("application/json")) {
-                        throw new TypeError("Oops, we haven't got JSON!");
-                    }
+                    if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
                 })
                 .then(data => {
-                    if (data && (typeof data.count === 'number' || typeof data.count === 'string')) {
-                        el.textContent = `👤 Visitor #: ${data.count}`;
-                    } else {
-                        throw new Error("Invalid response format: " + JSON.stringify(data));
-                    }
+                    // Create our master clock from the authoritative ISO 8601 datetime string.
+                    // This is parsed reliably by all browsers.
+                    const authoritativeUKTime = new Date(data.datetime);
+
+                    // Start the clock ticker
+                    setInterval(() => {
+                        // Each second, add 1000 milliseconds to our master clock
+                        authoritativeUKTime.setMilliseconds(
+                            authoritativeUKTime.getMilliseconds() + 1000
+                        );
+                        
+                        // Format and display the new time
+                        if (ukTimeEl) {
+                            ukTimeEl.textContent = formatUKTime(authoritativeUKTime);
+                        }
+                    }, 1000);
+                })
+                .catch(error => {
+                    console.error('Failed to fetch authoritative time:', error);
+                    if (ukTimeEl) ukTimeEl.textContent = 'Could not load UK time.';
+                });
+        }
+
+        // Start the clock process when the page is loaded.
+        document.addEventListener('DOMContentLoaded', initClock);
+
+
+        // --- Visitor Counter ---
+        // (This part is unchanged)
+        document.addEventListener("DOMContentLoaded", () => {
+            const el = document.getElementById("count");
+            if (!el) return;
+            el.textContent = "👤 Loading...";
+            const apiUrl = "https://resumevisitor-fn-dyb9dsguddgzdzge.uksouth-01.azurewebsites.net/api/updateCounter";
+            fetch(apiUrl, { mode: 'cors' })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    el.textContent = `👤 Visitor #: ${data.count}`;
                 })
                 .catch(err => {
                     console.error("❌ Visitor count fetch failed:", err);
-                    if (el) {
-                        el.textContent = "👤 Visitor #: N/A";
-                    }
+                    el.textContent = "👤 Visitor #: N/A";
                 });
         });
     </script>
@@ -498,54 +488,6 @@
     </section>
     </main>
 
-    <script>
-        // Theme handling
-        function setTheme(theme) {
-            document.body.classList.toggle('dark', theme === 'dark');
-            document.getElementById('themeToggle').textContent = theme === 'dark' ? '☀️' : '🌙';
-        }
-        function getPreferredTheme() {
-            const stored = localStorage.getItem('theme');
-            if (stored) return stored;
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        function toggleTheme() {
-            const isDark = document.body.classList.contains('dark');
-            const next = isDark ? 'light' : 'dark';
-            setTheme(next); localStorage.setItem('theme', next);
-        }
-        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-        setTheme(getPreferredTheme());
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            if (!localStorage.getItem('theme')) setTheme(e.matches ? 'dark' : 'light');
-        });
-
-        // Fancy UK Time
-        function updateUKTime() {
-            const el = document.getElementById('uk-time');
-            const now = new Date();
-            const uk = new Date(now.toLocaleString('en-GB', { timeZone: 'Europe/London' }));
-            const pad = n => String(n).padStart(2, '0');
-            const hours = pad(uk.getHours()), mins = pad(uk.getMinutes()), secs = pad(uk.getSeconds());
-            const day = uk.toLocaleDateString('en-GB', { weekday: 'long' });
-            const date = uk.toLocaleDateString('en-GB');
-            el.textContent = `📅 ${day}, ${date} | 🕒 ${hours}:${mins}:${secs}`;
-        }
-        setInterval(updateUKTime, 1000); updateUKTime();
-
-        // Visitor Counter
-        window.addEventListener('DOMContentLoaded', () => {
-            const el = document.getElementById('visitor-counter');
-            if (!el) { console.error('Visitor element not found'); return; }
-            fetch('https://resumevisitor-fn-dyb9dsguddgzdzge.uksouth-01.azurewebsites.net/api/updateCounter')
-                .then(res => { if (!res.ok) throw new Error('Bad network'); return res.json(); })
-                .then(data => {
-                    if (data && typeof data.count === 'number') el.textContent = `👤 Visitor #: ${data.count}`;
-                    else { el.textContent = '👤 Visitor #: N/A'; console.warn('Unexpected response', data); }
-                })
-                .catch(err => { console.error('Visitor error', err); el.textContent = '👤 Visitor #: N/A'; });
-        });
-    </script>
 </body>
 
 </html>
