@@ -240,20 +240,45 @@
         });
 
 
-        // --- Fancy UK Time Display (Corrected) ---
+        // --- Fancy UK Time Display (Robust Version) ---
         function updateUKTime() {
             const ukTimeEl = document.getElementById('uk-time');
             const now = new Date();
 
-            // Define formatting options
-            const timeOptions = { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-            const dayOptions = { timeZone: 'Europe/London', weekday: 'long' };
-            const dateOptions = { timeZone: 'Europe/London', day: '2-digit', month: '2-digit', year: 'numeric' };
+            // Define options for ALL the parts we need in a single object
+            const options = {
+                timeZone: 'Europe/London',
+                weekday: 'long',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false // Use 24-hour time for consistency
+            };
 
-            // Format parts directly from the 'now' object to avoid parsing errors
-            const timeString = now.toLocaleTimeString('en-GB', timeOptions);
-            const dayString = now.toLocaleDateString('en-GB', dayOptions);
-            const dateString = now.toLocaleDateString('en-GB', dateOptions);
+            // Create a single, robust formatter for the 'en-GB' locale
+            const formatter = new Intl.DateTimeFormat('en-GB', options);
+            
+            // Get all parts in one single, reliable operation
+            const parts = formatter.formatToParts(now);
+
+            // Create a helper function to easily find the value of each part
+            const findPart = (type) => parts.find(part => part.type === type)?.value || '';
+
+            // Extract each part by its type
+            const dayString    = findPart('weekday');
+            const day        = findPart('day');
+            const month      = findPart('month');
+            const year       = findPart('year');
+            const hour       = findPart('hour');
+            const minute     = findPart('minute');
+            const second     = findPart('second');
+
+            // Manually assemble the final strings to ensure correct format
+            const dateString = `${day}/${month}/${year}`;
+            const timeString = `${hour}:${minute}:${second}`;
 
             // Update the element content
             ukTimeEl.textContent = `📅 ${dayString}, ${dateString} | 🕒 ${timeString}`;
