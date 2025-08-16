@@ -141,11 +141,6 @@
             text-decoration: underline;
         }
 
-        .github-button:hover,
-        .back-to-top:hover {
-            text-decoration: none;
-        }
-
         p {
             margin: 0 0 10px 0;
         }
@@ -429,8 +424,7 @@
 
         .theme-toggle,
         .print-button,
-        .back-to-top,
-        .github-button {
+        .back-to-top {
             position: fixed;
             right: 20px;
             background: var(--button-bg-light);
@@ -440,18 +434,8 @@
             padding: 0.5rem 1rem;
             font-size: 1.2rem;
             cursor: pointer;
-            transition: background 0.2s, color 0.2s, opacity 0.3s, visibility 0.3s, filter 0.2s;
+            transition: background 0.2s, color 0.2s, opacity 0.3s, visibility 0.3s;
             z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .theme-toggle:hover,
-        .print-button:hover,
-        .back-to-top:hover,
-        .github-button:hover {
-            filter: brightness(1.2);
         }
 
         .theme-toggle {
@@ -462,20 +446,15 @@
             top: 70px;
         }
 
-        .github-button {
-            top: 120px;
-        }
-
         .back-to-top {
-            top: 170px;
+            top: 120px;
             opacity: 0;
             visibility: hidden;
         }
 
         body.dark .theme-toggle,
         body.dark .print-button,
-        body.dark .back-to-top,
-        body.dark .github-button {
+        body.dark .back-to-top {
             background: var(--button-bg-dark);
             color: var(--text-dark);
         }
@@ -515,6 +494,7 @@
         }
 
         #uk-time {
+            /* UPDATED: font-family removed to align with visitor count */
             background-color: var(--time-bg-light);
             color: #333;
             padding: 8px 12px;
@@ -533,13 +513,9 @@
 
 <body id="page-top">
 
-    <button class="theme-toggle no-print" id="themeToggle" title="Light/Dark Theme"
-        aria-label="Toggle dark mode">🌙</button>
-    <button class="print-button no-print" id="printBtn" title="Print" aria-label="Print Resume">🖨️</button>
-    <a href="https://saviong.github.io/" target="_blank" class="github-button no-print" id="githubBtn"
-        title="My GitHub Page" aria-label="My GitHub Page">🔗</a>
-    <a href="#page-top" class="back-to-top no-print" id="backToTopBtn" title="Back to Top"
-        aria-label="Back to top">⬆️</a>
+    <button class="theme-toggle no-print" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+    <button class="print-button no-print" id="printBtn" aria-label="Print Resume">🖨️</button>
+    <a href="#page-top" class="back-to-top no-print" id="backToTopBtn" aria-label="Back to top">⬆️</a>
 
     <div class="page-container">
         <div class="top-bar no-print">
