@@ -26,7 +26,7 @@
             body {
                 max-width: 100% !important;
                 margin: 0 !important;
-                padding: 8mm !important;
+                padding: 10mm !important;
                 box-shadow: none !important;
                 border-radius: 0 !important;
             }
@@ -77,7 +77,7 @@
 
         @page {
             size: A4;
-            margin: 5mm;
+            margin: 10mm;
         }
 
         html {
@@ -88,7 +88,7 @@
         body {
             font-family: 'Inter', sans-serif;
             color: #333;
-            line-height: 1.20;
+            line-height: 1.35;
             box-sizing: border-box;
             background: #ffffff;
             max-width: 800px;
@@ -106,7 +106,7 @@
             margin: 0;
             padding: 0;
             color: #1a202c;
-            line-height: 0.9;
+            line-height: 1.2;
         }
 
         h1 {
@@ -120,7 +120,7 @@
             font-weight: 600;
             border-bottom: 2px solid #e2e8f0;
             padding-bottom: 4px;
-            margin-top: 15px;
+            margin-top: 25px;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -157,7 +157,7 @@
         }
 
         li {
-            margin-bottom: 13.5px;
+            margin-bottom: 15px;
         }
 
         /* * Header & Contact Information */
@@ -190,7 +190,7 @@
 
         /* * Main Content Sections */
         .section {
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         .section-content {
@@ -202,8 +202,8 @@
         .project,
         .education-item {
             display: flex;
-            gap: 7.5px;
-            margin-bottom: 10px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         #early-career-job .icon-placeholder img {
@@ -214,7 +214,7 @@
             display: flex;
             gap: 15px;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         .icon-placeholder {
@@ -263,7 +263,7 @@
         }
 
         .item-details ul li {
-            margin-bottom: 4.5px;
+            margin-bottom: 5px;
         }
 
         .project-header {
@@ -544,7 +544,7 @@
     <div class="page-container">
         <div class="top-bar no-print">
             <div class="time-counter-wrapper">
-                <div id="uk-time">Loading system time...</div>
+                <div id="uk-time">Loading UK time...</div>
                 <span>&nbsp;&nbsp;</span>
                 <div id="count">Loading...</div>
             </div>
@@ -622,7 +622,7 @@
             <div class="section-content">
                 <div class="job">
                     <div class="icon-placeholder">
-                        <img src="https://scontent.flba1-1.fna.fbcdn.net/v/t39.30808-6/417498514_810712307753996_2662787658689949717_n.jpg?_nc_cat=1&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=mLgAzNXDdA4Q7kNvwFFFUb9&_nc_oc=AdkFjjj9dfsQ98GqPU2ar-UAzrsfN-AiD9WAw2cmY4ZI1RI8q7oTad6KVwt2k3XVfK2Y7Dj5E0FxxVBfVEV5ejDL&_nc_zt=23&_nc_ht=scontent.flba1-1.fna&_nc_gid=5isehsyPuPBajvME5KzAsg&oh=00_AfUvvHGlYgpR98TFkH5lW2NQWxL05GeQko29ZF7FW--ytA&oe=68ACF91B"
+                        <img src="https://scontent-lhr6-1.xx.fbcdn.net/v/t39.30808-1/417498514_810712307753996_2662787658689949717_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=1&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=4DdmUEHdrMUQ7kNvwGZamqH&_nc_oc=AdnyRPoXHx0DsAUS45p_7MYDYwXdXyvMjjrv7h9scPLHit3hQQcJMwjuFlPJMYNi7_M&_nc_zt=24&_nc_ht=scontent-lhr6-1.xx&_nc_gid=mlJzEzBMocFY2nPyWMopsQ&oh=00_AfVVNobVDkNvRbCtbjoXFaeTcjxVXla2JZvTzQ3mtE8CVA&oe=68A3C31D"
                             alt="Anthony Nolan Icon">
                     </div>
                     <div class="item-details">
@@ -633,10 +633,6 @@
                         <div class="role">
                             <span class="role-title">Laboratory Asset Coordinator</span>
                             <span class="date">Aug 2021 - Present <span class="duration">(4 yrs)</span></span>
-                        </div>
-                        <div class="role">
-                            <span class="role-title"></span>
-                            <span class="date"><span class="duration"></span></span>
                         </div>
                         <ul>
                             <li>Developed and deployed 5+ workflows using Power Automate to automate repetitive tasks,
@@ -727,8 +723,7 @@
                                 alt="PSM I Certification Icon">
                         </div>
                         <div class="item-details">
-                            <h3 style="font-size: 1rem;">Professional Scrum Master™ I</h3>
-                            <h3 style="font-size: 1rem;">(PSM I)</h3>
+                            <h3 style="font-size: 1rem;">Professional Scrum Master™ I (PSM I)</h3>
                         </div>
                     </div>
                     <div class="certification-item">
@@ -822,11 +817,12 @@
                 window.print();
             });
 
-            // --- System Clock ---
-            const timeEl = document.getElementById('uk-time');
+            // --- Authoritative UK Time Clock ---
+            const ukTimeEl = document.getElementById('uk-time');
 
-            function formatSystemTime(dateObject) {
+            function formatUKTime(dateObject) {
                 const options = {
+                    timeZone: 'Europe/London',
                     weekday: 'long',
                     day: '2-digit',
                     month: '2-digit',
@@ -847,17 +843,32 @@
                 return `📅 ${dayString}, ${dateString} | 🕒 ${timeString}`;
             }
 
-            function initSystemClock() {
-                if (timeEl) {
-                    const updateClock = () => {
-                        const now = new Date();
-                        timeEl.textContent = formatSystemTime(now);
-                    };
-                    updateClock(); // Initial call
-                    setInterval(updateClock, 1000); // Update every second
-                }
+            function initClock() {
+                fetch('https://timeapi.io/api/Time/current/zone?timeZone=Europe/London', { mode: 'cors' })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        const authoritativeUKTime = new Date(data.dateTime);
+
+                        if (ukTimeEl) {
+                            ukTimeEl.textContent = formatUKTime(authoritativeUKTime);
+                        }
+
+                        setInterval(() => {
+                            authoritativeUKTime.setSeconds(authoritativeUKTime.getSeconds() + 1);
+                            if (ukTimeEl) {
+                                ukTimeEl.textContent = formatUKTime(authoritativeUKTime);
+                            }
+                        }, 1000);
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch authoritative time:', error);
+                        if (ukTimeEl) ukTimeEl.textContent = 'Could not load UK time.';
+                    });
             }
-            initSystemClock();
+            initClock();
 
 
             // --- Visitor Counter ---
