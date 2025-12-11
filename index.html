@@ -880,7 +880,7 @@
             const countEl = document.getElementById("count");
             if (countEl) {
                 countEl.textContent = "👤 Loading...";
-                const apiUrl = "https://resumevisitor-fn-dyb9dsguddgzdzge.uksouth-01.azurewebsites.net/api/updateCounter";
+                const apiUrl = "https://mycv.saviong.com/api/updatecounter";
                 fetch(apiUrl, { mode: 'cors' })
                     .then(response => {
                         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
