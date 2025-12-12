@@ -2,7 +2,7 @@ name: Deploy Frontend Resume to Azure Blob
 
 on:
   push:
-    branches: [master]  # or main if that's your default
+    branches: [master]
 
 jobs:
   deploy:
