@@ -554,6 +554,7 @@
             <div class="identity">
                 <h1>Savio Ng</h1>
                 <p class="job-title">Cloud Engineer | DevOps Engineer</p>
+                <p class="job-title" style="font-size: 1.1rem;">specialising in Python and Terraform</p>
             </div>
             <div class="contact-info">
                 <span style="font-weight: bold; text-decoration: underline;">Contact Information</span>
@@ -588,15 +589,15 @@
                                 <a href="https://github.com/saviong/html-resume-backend" target="_blank">Backend</a>
                             </div>
                         </div>
-                        <p style="margin-top: 8px;">Built a full CI/CD pipeline using GitHub Actions and ARM templates
-                            to automate the deployment of a serverless portfolio – Python, HTML, CSS, Azure Storage,
-                            Azure Function App, Frontdoor, Cosmos DB, GitHub Actions</p>
+                        <p style="margin-top: 8px;">Built a full CI/CD pipeline to automate the deployment of a
+                            serverless and secure portfolio – Python, HTML, CSS, Azure Storage, Azure Function App,
+                            Frontdoor, Networking, Cosmos DB</p>
                     </div>
                 </div>
                 <div class="project">
                     <div class="item-details">
                         <div class="project-header">
-                            <h3>Multi-Cloud & Reproducible IaC Templates</h3>
+                            <h3>Multi-Cloud Infrastructure as Code Templates</h3>
                             <div class="project-links">
                                 GitHub:
                                 <a href="https://github.com/saviong/terraform-multicloud-vm"
@@ -605,8 +606,8 @@
                                 <a href="https://github.com/saviong/vm-deploy" target="_blank">Azure</a>
                             </div>
                         </div>
-                        <p style="margin-top: 8px;">Reduced VM deployment time to under 10 minutes by creating
-                            standardised, multi-cloud IaC templates for provisioning Nginx servers – Terraform, Bicep,
+                        <p style="margin-top: 8px;">Reduced VM deployment time to under 10 minutes by creating reliable
+                            and secure multi-cloud IaC templates for provisioning Nginx servers – Terraform, Bicep,
                             Azure Virtual Machines, Amazon Web Services</p>
                     </div>
                 </div>
@@ -621,7 +622,7 @@
                             </div>
                         </div>
                         <p style="margin-top: 8px;">Built a full-stack cheminformatics app with a Scikit-learn model and
-                            containerized the entire ML pipeline using Docker to create a reproducible, portable
+                            containerised the entire ML pipeline using Docker to create a reproducible, portable
                             prediction tool – Python, HTML, CSS, Docker</p>
                     </div>
                 </div>
@@ -642,7 +643,8 @@
                         </div>
                         <div class="role">
                             <span class="role-title">Laboratory Asset Coordinator</span>
-                            <span class="date">Aug 2021 - Present <span class="duration">(4 yrs)</span></span>
+                            <span class="date">Aug 2021 - Present <span class="duration"
+                                    id="an-duration">(Calculating...)</span></span>
                         </div>
                         <div class="role">
                             <span class="role-title"></span>
@@ -651,10 +653,10 @@
                         <ul>
                             <li>Developed and deployed 5+ workflows using Power Automate to automate repetitive tasks,
                                 saving an estimated 10 hours of manual work per week.</li>
+                            <li>Designed data models to forecast stock replenishment and track expiry, achieving a 30%
+                                reduction in costs.</li>
                             <li>Analysed existing operational workflows, gathered stakeholder requirements, and
-                                implemented process improvements that reduced system inefficiencies by 20%.</li>
-                            <li>Leveraged data analysis to forecast resource needs and optimise procurement cycles,
-                                cutting operational costs by 10%.</li>
+                                implemented process improvements that lowered system inefficiencies by 20%.</li>
                         </ul>
                     </div>
                 </div>
@@ -677,10 +679,10 @@
                             <span class="date">Sep 2017 - Jul 2020 <span class="duration">(2 yrs 11 mths)</span></span>
                         </div>
                         <ul>
-                            <li>Engineered an automation solution using VBA to streamline administrative workflows,
-                                eliminating 80% of manual task time.</li>
-                            <li>Mentored a team of three, improving team productivity by 20% through enhanced training
-                                and collaborative processes.</li>
+                            <li>Designed a solution via VBA to automate administrative workflows and reduce 80% of
+                                manual task time.</li>
+                            <li>Mentored a team of 3, improving team productivity by 20% via enhanced training and
+                                collaborative processes.</li>
                             <li>Drove a 20% increase in service adoption by analyzing customer data and translating
                                 complex client requirements into detailed service agreements.</li>
                         </ul>
@@ -877,7 +879,28 @@
                 }
             }
             initSystemClock();
+            // --- Dynamic Job Duration Logic ---
+            function updateJobDuration() {
+                const startDate = new Date('2021-08-15');
+                const now = new Date();
 
+                // Calculate total months difference
+                let months = (now.getFullYear() - startDate.getFullYear()) * 12;
+                months -= startDate.getMonth();
+                months += now.getMonth();
+
+                // Calculate years and remaining months
+                const yearsCount = Math.floor(months / 12);
+                const monthsCount = months % 12;
+
+                // Update the HTML element
+                const durationEl = document.getElementById('an-duration');
+                if (durationEl) {
+                    durationEl.textContent = `(${yearsCount} yrs ${monthsCount} mths)`;
+                }
+            }
+
+            updateJobDuration();
 
             // --- Visitor Counter ---
             const countEl = document.getElementById("count");
