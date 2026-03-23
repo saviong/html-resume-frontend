@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savio Ng - Resume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* * A4 Page Layout & General Styling */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+
+            body,
+            html {
+                margin: 0;
+                padding: 0;
+                background: #ffffff !important;
+                box-shadow: none !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+
+            body {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 8mm !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+
+            /* Enforce light theme styles for printing */
+            body,
+            body.dark {
+                background: #ffffff !important;
+                color: #333 !important;
+            }
+
+            h1,
+            h2,
+            h3,
+            .role-title {
+                color: #1a202c !important;
+            }
+
+            h3 {
+                color: #2d3748 !important;
+            }
+
+            .header .job-title,
+            .contact-info,
+            .contact-info a,
+            .project-links,
+            .item-header .location,
+            .item-header .date,
+            .company-header .location,
+            .role .date,
+            .role .duration,
+            .icon-placeholder {
+                color: #4a5568 !important;
+            }
+
+            a {
+                color: #2b6cb0 !important;
+            }
+
+            h2 {
+                border-bottom-color: #e2e8f0 !important;
+            }
+
+            #early-career-job .icon-placeholder img {
+                filter: invert(0) !important;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin: 5mm;
+        }
+
+        html {
+            background-color: #f8f9fa;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #333;
+            line-height: 1.20;
+            box-sizing: border-box;
+            background: #ffffff;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 40px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        /* * Typography & Links */
+        h1,
+        h2,
+        h3 {
+            margin: 0;
+            padding: 0;
+            color: #1a202c;
+            line-height: 0.9;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 4px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        a {
+            color: #2b6cb0;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .github-button:hover,
+        .back-to-top:hover {
+            text-decoration: none;
+        }
+
+        p {
+            margin: 0 0 10px 0;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        li {
+            margin-bottom: 13.5px;
+        }
+
+        /* * Header & Contact Information */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 21px;
+        }
+
+        .header .job-title {
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .contact-info {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .contact-info a {
+            color: #4a5568;
+        }
+
+        .contact-info span {
+            display: block;
+        }
+
+        /* * Main Content Sections */
+        .section {
+            margin-bottom: 10px;
+        }
+
+        .section-content {
+            padding-left: 10px;
+        }
+
+        /* * Work Experience & Projects Styling */
+        .job,
+        .project,
+        .education-item {
+            display: flex;
+            gap: 7.5px;
+            margin-bottom: 10px;
+        }
+
+        #early-career-job .icon-placeholder img {
+            transition: filter 0.3s ease-in-out;
+        }
+
+        .certification-item {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .icon-placeholder {
+            width: 53px;
+            height: 53px;
+            background-color: transparent;
+            border-radius: 4px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #718096;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .icon-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .item-details {
+            flex-grow: 1;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+
+        .item-header .location,
+        .item-header .date {
+            font-size: 0.9rem;
+            color: #718096;
+            font-style: normal;
+        }
+
+        .item-details ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin-top: 5px;
+        }
+
+        .item-details ul li {
+            margin-bottom: 4.5px;
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .project-links {
+            font-weight: 500;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            color: #4a5568;
+        }
+
+        .company-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+
+        .company-header .location {
+            font-size: 0.9rem;
+            color: #718096;
+            font-style: normal;
+        }
+
+        .role {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+
+        .role-title {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1rem;
+        }
+
+        .role .date {
+            font-size: 0.9rem;
+            color: #718096;
+            font-style: normal;
+            padding-left: 15px;
+        }
+
+        .role .duration {
+            font-size: 0.9rem;
+            color: #718096;
+            font-style: normal;
+            padding-left: 5px;
+        }
+
+        .project-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 8px;
+        }
+
+        .summary-skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .summary-skills-grid h2 {
+            margin-top: 0;
+        }
+
+        .summary-skills-grid .section-content {
+            padding-left: 0;
+        }
+
+        .cert-edu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .job .item-details ul {
+            margin-left: -68px;
+        }
+
+        #work-experience {
+            margin-bottom: 10px;
+        }
+
+        /* --- STYLES FOR WIDGETS AND THEME --- */
+        :root {
+            --background-light: #ffffff;
+            --background-dark: #1e1e24;
+            --html-background-dark: #18181b;
+            --text-light: #333;
+            --text-dark: #f1f5f9;
+            --header-text-dark: #ffffff;
+            --border-dark: #404040;
+            --button-bg-light: #e2e8f0;
+            --button-bg-dark: #27272a;
+            --time-bg-light: #f0f0f0;
+            --time-bg-dark: #2d2d32;
+            --visitor-bg-light: #e7f4ff;
+            --visitor-bg-dark: #334155;
+        }
+
+        html.dark {
+            background-color: var(--html-background-dark);
+        }
+
+        body.dark {
+            background: var(--background-dark);
+            color: var(--text-dark);
+        }
+
+        body.dark h1,
+        body.dark h2,
+        body.dark h3 {
+            color: var(--header-text-dark);
+        }
+
+        body.dark .header .job-title,
+        body.dark .contact-info,
+        body.dark .contact-info a {
+            color: #a0aec0;
+        }
+
+        body.dark h2 {
+            border-bottom: 2px solid var(--border-dark);
+        }
+
+        body.dark h3,
+        body.dark .role-title {
+            color: #e2e8f0;
+        }
+
+        body.dark .item-header .location,
+        body.dark .item-header .date,
+        body.dark .company-header .location,
+        body.dark .role .date,
+        body.dark .role .duration,
+        body.dark .icon-placeholder {
+            color: #a0aec0;
+        }
+
+        body.dark .project-links {
+            color: #a0aec0;
+        }
+
+        body.dark #early-career-job .icon-placeholder img {
+            filter: invert(1);
+        }
+
+        body.dark a {
+            color: #60a5fa;
+        }
+
+        .theme-toggle,
+        .print-button,
+        .back-to-top,
+        .github-button {
+            position: fixed;
+            right: 20px;
+            background: var(--button-bg-light);
+            color: #333;
+            border: none;
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, opacity 0.3s, visibility 0.3s, filter 0.2s;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover,
+        .print-button:hover,
+        .back-to-top:hover,
+        .github-button:hover {
+            filter: brightness(1.2);
+        }
+
+        .theme-toggle {
+            top: 20px;
+        }
+
+        .print-button {
+            top: 70px;
+        }
+
+        .github-button {
+            top: 120px;
+        }
+
+        .back-to-top {
+            top: 170px;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        body.dark .theme-toggle,
+        body.dark .print-button,
+        body.dark .back-to-top,
+        body.dark .github-button {
+            background: var(--button-bg-dark);
+            color: var(--text-dark);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin: -20px 0 30px 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .time-counter-wrapper {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #count {
+            background-color: var(--visitor-bg-light);
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background 0.2s, color 0.2s;
+            font-size: 0.9rem;
+        }
+
+        body.dark #count {
+            background-color: var(--visitor-bg-dark);
+            color: var(--text-dark);
+        }
+
+        #uk-time {
+            background-color: var(--time-bg-light);
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: background 0.2s, color 0.2s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        body.dark #uk-time {
+            background-color: var(--time-bg-dark);
+            color: var(--text-dark);
+        }
+    </style>
+</head>
+
+<body id="page-top">
+
+    <button class="theme-toggle no-print" id="themeToggle" title="Light/Dark Theme"
+        aria-label="Toggle dark mode">🌙</button>
+    <button class="print-button no-print" id="printBtn" title="Print" aria-label="Print Resume">🖨️</button>
+    <a href="https://saviong.github.io/" target="_blank" class="github-button no-print" id="githubBtn"
+        title="My GitHub Page" aria-label="My GitHub Page">🔗</a>
+    <a href="#page-top" class="back-to-top no-print" id="backToTopBtn" title="Back to Top"
+        aria-label="Back to top">⬆️</a>
+
+    <div class="page-container">
+        <div class="top-bar no-print">
+            <div class="time-counter-wrapper">
+                <div id="uk-time">Loading system time...</div>
+                <span>&nbsp;&nbsp;</span>
+                <div id="count">Loading...</div>
+            </div>
+        </div>
+
+        <header class="header">
+            <div class="identity">
+                <h1>Savio Ng</h1>
+                <p class="job-title">Cloud Engineer | DevOps Engineer</p>
+                <p class="job-title" style="font-size: 1.1rem;">specialising in Python and Terraform</p>
+            </div>
+            <div class="contact-info">
+                <span style="font-weight: bold; text-decoration: underline;">Contact Information</span>
+                <span>+44-(0)7716285798</span>
+                <span><a href="mailto:yeungson@gmail.com">yeungson@gmail.com</a></span>
+                <span><a href="https://www.linkedin.com/in/saviong" target="_blank">linkedin.com/in/saviong</a></span>
+                <span><a href="https://github.com/saviong" target="_blank">github.com/saviong</a></span>
+                <span><a href="https://saviong.github.io/" target="_blank">saviong.github.io</a></span>
+                <span>London, UK</span>
+            </div>
+        </header>
+
+        <section class="section">
+            <h2>Technical Skills</h2>
+            <div class="section-content">
+                <p>Azure, AWS, Terraform, Bicep, ARM Templates, CloudFormation, Python, Bash, PowerShell, TypeScript,
+                    JavaScript, Docker, Kubernetes, GitHub Actions (CI/CD), YAML, Scrum, Jira</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Technical Projects</h2>
+            <div class="section-content">
+                <div class="project">
+                    <div class="item-details">
+                        <div class="project-header">
+                            <h3>Serverless Portfolio with CI/CD on Azure</h3>
+                            <div class="project-links">
+                                <a href="https://mycv.saviong.com" target="_blank">Portfolio</a> |
+                                GitHub: <a href="https://github.com/saviong/html-resume-frontend"
+                                    target="_blank">Frontend</a> |
+                                <a href="https://github.com/saviong/html-resume-backend" target="_blank">Backend</a>
+                            </div>
+                        </div>
+                        <p style="margin-top: 8px;">Built a full CI/CD pipeline to automate the deployment of a
+                            serverless and secure portfolio – Python, HTML, CSS, Azure Storage, Azure Function App,
+                            Frontdoor, Networking, Cosmos DB</p>
+                    </div>
+                </div>
+                <div class="project">
+                    <div class="item-details">
+                        <div class="project-header">
+                            <h3>Multi-Cloud Infrastructure as Code Templates</h3>
+                            <div class="project-links">
+                                GitHub:
+                                <a href="https://github.com/saviong/terraform-multicloud-vm"
+                                    target="_blank">Multi-Cloud</a> |
+                                <a href="https://github.com/saviong/ec2-deploy" target="_blank">AWS</a> |
+                                <a href="https://github.com/saviong/vm-deploy" target="_blank">Azure</a>
+                            </div>
+                        </div>
+                        <p style="margin-top: 8px;">Reduced VM deployment time to under 10 minutes by creating reliable
+                            and secure multi-cloud IaC templates for provisioning Nginx servers – Terraform, Bicep,
+                            Azure Virtual Machines, Amazon Web Services</p>
+                    </div>
+                </div>
+                <div class="project">
+                    <div class="item-details">
+                        <div class="project-header">
+                            <h3>Cheminformatics ML App with Docker</h3>
+                            <div class="project-links">
+                                GitHub:
+                                <a href="https://github.com/saviong/molecular-property-predictor"
+                                    target="_blank">molecular-property-predictor</a>
+                            </div>
+                        </div>
+                        <p style="margin-top: 8px;">Built a full-stack cheminformatics app with a Scikit-learn model and
+                            containerised the entire ML pipeline using Docker to create a reproducible, portable
+                            prediction tool – Python, HTML, CSS, Docker</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="work-experience">
+            <h2>Work Experience</h2>
+            <div class="section-content">
+                <div class="job">
+                    <div class="icon-placeholder">
+                        <img src="pic/an_logo.jpg" alt="Anthony Nolan Icon">
+                    </div>
+                    <div class="item-details">
+                        <div class="company-header">
+                            <h3>Anthony Nolan</h3>
+                            <span class="location">London, UK</span>
+                        </div>
+                        <div class="role">
+                            <span class="role-title">Laboratory Asset Coordinator</span>
+                            <span class="date">Aug 2021 - Present <span class="duration"
+                                    id="an-duration">(Calculating...)</span></span>
+                        </div>
+                        <div class="role">
+                            <span class="role-title"></span>
+                            <span class="date"><span class="duration"></span></span>
+                        </div>
+                        <ul>
+                            <li>Developed and deployed 5+ workflows using Power Automate to automate repetitive tasks,
+                                saving an estimated 10 hours of manual work per week.</li>
+                            <li>Designed data models to forecast stock replenishment and track expiry, achieving a 30%
+                                reduction in costs.</li>
+                            <li>Analysed existing operational workflows, gathered stakeholder requirements, and
+                                implemented process improvements that lowered system inefficiencies by 20%.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job">
+                    <div class="icon-placeholder">
+                        <img src="https://media.licdn.com/dms/image/v2/C4E0BAQFb81RYxeB1sw/company-logo_200_200/company-logo_200_200/0/1639728697875/medifast_hong_kong_limited_logo?e=2147483647&v=beta&t=uBfxEHGVOWJMvbMlaNtId5I8flBN4xKuUDYb-1r6OTI"
+                            alt="MediFast (Hong Kong) Ltd. Icon">
+                    </div>
+                    <div class="item-details">
+                        <div class="company-header">
+                            <h3>MediFast (Hong Kong) Ltd.</h3>
+                            <span class="location">Hong Kong</span>
+                        </div>
+                        <div class="role">
+                            <span class="role-title">Senior Business Development Officer</span>
+                            <span class="date">Aug 2020 - May 2021 <span class="duration">(10 mths)</span></span>
+                        </div>
+                        <div class="role">
+                            <span class="role-title">Business Development Officer</span>
+                            <span class="date">Sep 2017 - Jul 2020 <span class="duration">(2 yrs 11 mths)</span></span>
+                        </div>
+                        <ul>
+                            <li>Designed a solution via VBA to automate administrative workflows and reduce 80% of
+                                manual task time.</li>
+                            <li>Mentored a team of 3, improving team productivity by 20% via enhanced training and
+                                collaborative processes.</li>
+                            <li>Drove a 20% increase in service adoption by analyzing customer data and translating
+                                complex client requirements into detailed service agreements.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="job" id="early-career-job">
+                    <div class="icon-placeholder">
+                        <img src="https://static.vecteezy.com/system/resources/previews/024/208/012/non_2x/simple-briefcase-icon-the-icon-can-be-used-for-websites-print-templates-presentation-templates-illustrations-etc-free-vector.jpg"
+                            alt="Briefcase Icon">
+                    </div>
+                    <div class="item-details">
+                        <div class="company-header">
+                            <h3>Early Career Experience</h3>
+                            <span class="location">Hong Kong</span>
+                        </div>
+                        <div class="role">
+                            <span class="role-title">Medical Sales Representative at DKSH</span>
+                            <span class="date">May 2017 - Jul 2017 <span class="duration">(3 mths)</span></span>
+                        </div>
+                        <div class="role">
+                            <span class="role-title">Sales Executive at World Ways Co. (HK) Ltd.</span>
+                            <span class="date">Sep 2014 - Feb 2017 <span class="duration">(2 yrs 6 mths)</span></span>
+                        </div>
+                        <div class="role">
+                            <span class="role-title">Laboratory Technician at ASB Biodiesel</span>
+                            <span class="date">Jul 2013 - Jul 2014 <span class="duration">(1 yr 1 mth)</span></span>
+                        </div>
+                        <ul>
+                            <li>Held progressive roles in business development, medical sales, and laboratory quality
+                                control, developing foundational skills in data analysis, stakeholder relations, and
+                                process documentation.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="cert-edu-grid">
+            <section class="section">
+                <h2>Certifications</h2>
+                <div class="section-content">
+                    <div class="certification-item">
+                        <div class="icon-placeholder">
+                            <img src="https://images.credly.com/size/340x340/images/336eebfc-0ac3-4553-9a67-b402f491f185/azure-administrator-associate-600x600.png"
+                                alt="AZ-104 Certification Icon">
+                        </div>
+                        <div class="item-details">
+                            <h3 style="font-size: 1rem;">AZ-104 Microsoft Certified: Azure Administrator Associate, 2025
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="certification-item">
+                        <div class="icon-placeholder">
+                            <img src="pic/tf003.png" alt="Terraform Associate Certification Icon">
+                        </div>
+                        <div class="item-details">
+                            <h3 style="font-size: 1rem;">HashiCorp Certified: Terraform Associate (003), 2025</h3>
+                        </div>
+                    </div>
+                    <div class="certification-item">
+                        <div class="icon-placeholder">
+                            <img src="https://scrumorg-website-prod.s3.amazonaws.com/drupal/inline-images/2022-09/asset_44psmi_0.png"
+                                alt="PSM I Certification Icon">
+                        </div>
+                        <div class="item-details">
+                            <h3 style="font-size: 1rem;">Professional Scrum Master™ I (PSM I), 2025</h3>
+                        </div>
+                    </div>
+                    <div class="certification-item">
+                        <div class="icon-placeholder">
+                            <img src="https://wac-cdn.atlassian.com/dam/jcr:9c4bf443-5045-4ff9-a48d-36ae466f3ced/logos-atlassian-mini-icon-onecolor-blue.svg?cdnVersion=2903"
+                                alt="Atlassian Certification Icon">
+                        </div>
+                        <div class="item-details">
+                            <h3 style="font-size: 1rem;">Atlassian Agile Project Management Professional Certificate,
+                                2025
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Education</h2>
+                <div class="section-content">
+                    <div class="education-item">
+                        <div class="icon-placeholder">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZ9fVolEef1HReFwDpuViBiihsBgw5QjZpyw&s"
+                                alt="HKUST Icon">
+                        </div>
+                        <div class="item-details">
+                            <div class="item-header">
+                                <h3>Hong Kong University of Science and Technology</h3>
+                                <span class="date">2010 – 2013</span>
+                            </div>
+                            <p>BSc (Hons) in Chemistry</p>
+                        </div>
+                    </div>
+                    <div class="education-item">
+                        <div class="icon-placeholder">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Logo_of_the_Technical_University_of_Munich.svg"
+                                alt="TUM Icon">
+                        </div>
+                        <div class="item-details">
+                            <div class="item-header">
+                                <h3>Technische Universität München</h3>
+                                <span class="date">2012</span>
+                            </div>
+                            <p>Summer Exchange, Nanoscience and Nanotechnology</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // --- Theme Handling ---
+            const themeToggleButton = document.getElementById('themeToggle');
+            const htmlElement = document.documentElement;
+
+            function setTheme(theme) {
+                document.body.classList.toggle('dark', theme === 'dark');
+                htmlElement.classList.toggle('dark', theme === 'dark');
+                themeToggleButton.textContent = theme === 'dark' ? '☀️' : '🌙';
+                localStorage.setItem('theme', theme);
+            }
+
+            function getPreferredTheme() {
+                const storedTheme = localStorage.getItem('theme');
+                if (storedTheme) return storedTheme;
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function toggleTheme() {
+                const isDark = document.body.classList.contains('dark');
+                setTheme(isDark ? 'light' : 'dark');
+            }
+
+            setTheme(getPreferredTheme());
+            themeToggleButton.addEventListener('click', toggleTheme);
+
+            // --- Back to Top Button Logic ---
+            const backToTopBtn = document.getElementById('backToTopBtn');
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 200) {
+                    backToTopBtn.classList.add('visible');
+                } else {
+                    backToTopBtn.classList.remove('visible');
+                }
+            });
+
+            // --- Print Button Logic ---
+            const printBtn = document.getElementById('printBtn');
+            printBtn.addEventListener('click', () => {
+                window.print();
+            });
+
+            // --- System Clock ---
+            const timeEl = document.getElementById('uk-time');
+
+            function formatSystemTime(dateObject) {
+                const options = {
+                    weekday: 'long',
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                };
+                const formatter = new Intl.DateTimeFormat('en-GB', options);
+                const parts = formatter.formatToParts(dateObject);
+                const findPart = (type) => parts.find(part => part.type === type)?.value || '';
+
+                const dayString = findPart('weekday');
+                const dateString = `${findPart('day')}/${findPart('month')}/${findPart('year')}`;
+                const timeString = `${findPart('hour')}:${findPart('minute')}:${findPart('second')}`;
+
+                return `📅 ${dayString}, ${dateString} | 🕒 ${timeString}`;
+            }
+
+            function initSystemClock() {
+                if (timeEl) {
+                    const updateClock = () => {
+                        const now = new Date();
+                        timeEl.textContent = formatSystemTime(now);
+                    };
+                    updateClock(); // Initial call
+                    setInterval(updateClock, 1000); // Update every second
+                }
+            }
+            initSystemClock();
+            // --- Dynamic Job Duration Logic ---
+            function updateJobDuration() {
+                const startDate = new Date('2021-08-15');
+                const now = new Date();
+
+                // Calculate total months difference
+                let months = (now.getFullYear() - startDate.getFullYear()) * 12;
+                months -= startDate.getMonth();
+                months += now.getMonth();
+
+                // Calculate years and remaining months
+                const yearsCount = Math.floor(months / 12);
+                const monthsCount = months % 12;
+
+                // Update the HTML element
+                const durationEl = document.getElementById('an-duration');
+                if (durationEl) {
+                    durationEl.textContent = `(${yearsCount} yrs ${monthsCount} mths)`;
+                }
+            }
+
+            updateJobDuration();
+
+            // --- Visitor Counter ---
+            const countEl = document.getElementById("count");
+            if (countEl) {
+                countEl.textContent = "👤 Loading...";
+                const apiUrl = "https://mycv.saviong.com/api/updatecounter";
+                fetch(apiUrl, { mode: 'cors' })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(data => {
+                        countEl.textContent = `👤 Visitor #: ${data.count}`;
+                    })
+                    .catch(err => {
+                        console.error("❌ Visitor count fetch failed:", err);
+                        countEl.textContent = "👤 Visitor #: N/A";
+                    });
+            }
+        });
+    </script>
+</body>
+
+</html>
