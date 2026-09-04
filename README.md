@@ -1,10 +1,10 @@
 # 📝 Savio Ng – Interactive HTML Résumé (Frontend)
 
-A single-page résumé (CV) published as a **static website** on Azure Storage and delivered globally via **Azure Front Door CDN**. Updates are deployed automatically from GitHub Actions.
+A single-page résumé (CV) published as a **static website** on Azure. Updates are deployed automatically from GitHub Actions.
 
 | Live site | Tech stack | Deployment |
 |-----------|------------|------------|
-| [**https://mycv.saviong.com**](https://mycv.saviong.com) | HTML, CSS, Vanilla JS | Azure Static Website + CDN |
+| [**https://mycv.saviong.com**](https://mycv.saviong.com) | HTML, CSS, Vanilla JS | Azure Static Website |
 
 Please refer to <https://github.com/saviong/html-resume-backend> for the **Backend part** of the Interactive HTML Résumé.
 

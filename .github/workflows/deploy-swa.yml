@@ -1,0 +1,47 @@
+# Migration target: Azure Static Web Apps (Free plan).
+# Replaces the Blob Storage + Front Door setup with free managed TLS on
+# mycv.saviong.com and a same-origin /api route, at no monthly cost.
+#
+# Before the first run:
+#   1. Create the Static Web App (Free plan) and add its deployment token as
+#      the AZURE_STATIC_WEB_APPS_API_TOKEN repository secret.
+#   2. Set COSMOS_CONNECTION_STRING and TABLE_NAME in the Static Web App's
+#      application settings (not on the old Function App).
+#   3. Point the mycv CNAME at the Static Web App hostname and add the custom domain.
+#
+# Once this is green, delete deploy.yml and decommission resumevisitor-fn.
+name: Deploy to Azure Static Web Apps
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+
+      # The API lives in a separate repo, so pull it in as the api/ folder.
+      - name: Checkout backend into api/
+        uses: actions/checkout@v4
+        with:
+          repository: saviong/html-resume-backend
+          ref: master
+          path: api
+
+      - name: Stage site files
+        run: |
+          mkdir -p _site
+          cp index.html staticwebapp.config.json _site/
+          cp -r pic _site/
+          find _site -name '.DS_Store' -delete
+
+      - name: Build and deploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: upload
+          app_location: '_site'
+          api_location: 'api'
+          skip_app_build: true

@@ -2128,11 +2128,19 @@
     const iconSun = document.getElementById('icon-sun');
     const iconMoon = document.getElementById('icon-moon');
 
-    let currentTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const THEME_KEY = 'theme';
+    // Stored choice wins; otherwise follow the system preference.
+    const storedTheme = (() => {
+      try { return localStorage.getItem(THEME_KEY); } catch { return null; }
+    })();
+    let currentTheme = storedTheme === 'dark' || storedTheme === 'light'
+      ? storedTheme
+      : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     applyTheme(currentTheme);
 
     toggleBtn.addEventListener('click', () => {
       currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem(THEME_KEY, currentTheme); } catch { /* private mode */ }
       applyTheme(currentTheme);
     });
 
@@ -2184,20 +2192,23 @@
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        hour12: false
+        hour12: false,
+        timeZoneName: 'short'
       });
       const parts = formatter.formatToParts(now);
       const get = (t) => parts.find(p => p.type === t)?.value || '';
-      timeEl.textContent = `${get('weekday')} ${get('day')}/${get('month')}/${get('year')} ${get('hour')}:${get('minute')}:${get('second')} GMT`;
+      timeEl.textContent = `${get('weekday')} ${get('day')}/${get('month')}/${get('year')} ${get('hour')}:${get('minute')}:${get('second')} ${get('timeZoneName')}`;
     }
     updateClock();
     setInterval(updateClock, 1000);
 
     // ─── DYNAMIC JOB DURATION ─────────────────────────────────────
     function updateDuration() {
-      const start = new Date('2021-08-15');
+      const start = new Date(2021, 7, 15); // 15 Aug 2021, local time
       const now = new Date();
-      let months = (now.getFullYear() - start.getFullYear()) * 12 - start.getMonth() + now.getMonth();
+      let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+      if (now.getDate() < start.getDate()) months -= 1; // current month not completed yet
+      months = Math.max(0, months);
       const yr = Math.floor(months / 12), mo = months % 12;
       const el = document.getElementById('an-duration');
       if (el) el.textContent = `(${yr} yr${yr !== 1 ? 's' : ''} ${mo} mth${mo !== 1 ? 's' : ''})`;
@@ -2205,9 +2216,12 @@
     updateDuration();
 
     // ─── VISITOR COUNTER ──────────────────────────────────────────
+    // Same-origin by default (Static Web Apps serves the Function App under /api).
+    // Set API_BASE to the Function App origin if the API is not proxied on this host.
+    const API_BASE = '';
     const countEl = document.getElementById('count');
-    fetch('https://mycv.saviong.com/api/updatecounter', { mode: 'cors' })
-      .then(r => r.ok ? r.json() : Promise.reject())
+    fetch(`${API_BASE}/api/updateCounter`)
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))
       .then(data => { countEl.textContent = `Visitor #: ${data.count}`; })
       .catch(() => { countEl.textContent = 'Visitor #: —'; });
 
@@ -2264,68 +2278,6 @@
     focusToggle.addEventListener('change', () => html.classList.toggle('a11y-enhanced-focus', focusToggle.checked));
   </script>
 
-  <script data-pplx-inline-edit>
-    (function () {
-      if (window === window.top) return;
-      function inlineAll(orig, clone) {
-        if (orig.nodeType !== 1) return;
-        try {
-          var cs = getComputedStyle(orig);
-          var t = '';
-          for (var i = 0; i < cs.length; i++) { t += cs[i] + ':' + cs.getPropertyValue(cs[i]) + ';'; }
-          clone.style.cssText = t;
-        } catch (e) { }
-        var oc = orig.children, cc = clone.children;
-        for (var j = 0; j < oc.length && j < cc.length; j++) { inlineAll(oc[j], cc[j]); }
-      }
-      function stripExternal(clone) {
-        var imgs = clone.querySelectorAll('img');
-        for (var i = 0; i < imgs.length; i++) {
-          var s = imgs[i].getAttribute('src');
-          if (s && !s.startsWith('data:')) imgs[i].removeAttribute('src');
-        }
-        var all = clone.querySelectorAll('*');
-        for (var i = 0; i < all.length; i++) {
-          var st = all[i].style.cssText;
-          if (st && st.indexOf('url(') >= 0) {
-            all[i].style.cssText = st.replace(/url\(["']?(?!data:)[^)"']*["']?\)/gi, 'none');
-          }
-        }
-      }
-      window.addEventListener('message', function (e) {
-        if (!e.data || e.data.type !== 'INLINE_EDIT_CAPTURE_REQUEST') return;
-        var scrollX = window.scrollX || window.pageXOffset || 0;
-        var scrollY = window.scrollY || window.pageYOffset || 0;
-        var w = window.innerWidth, h = window.innerHeight;
-        try {
-          var clone = document.documentElement.cloneNode(true);
-          var rm = clone.querySelectorAll('script,link[rel="stylesheet"],style');
-          for (var i = 0; i < rm.length; i++) { rm[i].remove(); }
-          inlineAll(document.documentElement, clone);
-          stripExternal(clone);
-          var html = new XMLSerializer().serializeToString(clone);
-          var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">'
-            + '<foreignObject width="100%" height="100%">'
-            + '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + w + 'px;height:' + h + 'px;overflow:hidden">'
-            + '<div style="transform:translate(-' + scrollX + 'px,-' + scrollY + 'px);transform-origin:top left">'
-            + html + '</div></div></foreignObject></svg>';
-          var svgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-          var img = new Image();
-          img.onload = function () {
-            var c = document.createElement('canvas'); c.width = w; c.height = h;
-            c.getContext('2d').drawImage(img, 0, 0);
-            window.parent.postMessage({ type: 'INLINE_EDIT_SCREENSHOT_RESULT', dataUrl: c.toDataURL('image/png'), scrollX: scrollX, scrollY: scrollY }, '*');
-          };
-          img.onerror = function () {
-            window.parent.postMessage({ type: 'INLINE_EDIT_SCREENSHOT_RESULT', dataUrl: null, scrollX: scrollX, scrollY: scrollY }, '*');
-          };
-          img.src = svgUrl;
-        } catch (err) {
-          window.parent.postMessage({ type: 'INLINE_EDIT_SCREENSHOT_RESULT', dataUrl: null, scrollX: scrollX, scrollY: scrollY }, '*');
-        }
-      });
-    })();
-  </script>
 </body>
 
 </html>

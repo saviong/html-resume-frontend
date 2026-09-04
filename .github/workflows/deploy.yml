@@ -3,56 +3,54 @@ name: Deploy Frontend Resume to Azure Blob
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Azure Login with Service Principal
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # Only the published site should reach the public $web container.
+      # `upload-batch --source .` also uploads .git/, .github/, README.md and Archive/,
+      # all of which were previously served publicly.
+      - name: Stage site files
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -r pic _site/
+          find _site -name '.DS_Store' -delete
+          echo "Staged:"
+          find _site -type f | sort
 
-    - name: Upload to Azure Blob Storage
-      uses: azure/cli@v1
-      with:
-        inlineScript: |
-          echo "Uploading all files to Azure Blob Storage..."
-          
-          # Upload all files (excluding git and github folders)
-          az storage blob upload-batch \
-            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
-            --destination '$web' \
-            --source . \
-            --auth-mode key \
-            --account-key ${{ secrets.AZURE_STORAGE_KEY }} \
-            --overwrite true
-          
-          echo "✅ All files uploaded successfully!"
+      - name: Azure Login with Service Principal
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Purge Azure Front Door cache
-      uses: azure/cli@v1
-      with:
-        inlineScript: |
-          # Let the CLI auto-install missing extensions
-          az config set extension.use_dynamic_install=yes_without_prompt
+      - name: Upload to Azure Blob Storage
+        uses: azure/cli@v2
+        with:
+          inlineScript: |
+            az storage blob upload-batch \
+              --account-name "${{ secrets.AZURE_STORAGE_ACCOUNT }}" \
+              --destination '$web' \
+              --source _site \
+              --auth-mode key \
+              --account-key "${{ secrets.AZURE_STORAGE_KEY }}" \
+              --overwrite true
 
-          # Install/update the extension that exposes `az afd`
-          az extension add --name front-door --only-show-errors || az extension update --name front-door --only-show-errors
-
-          # Purge the AFD endpoint cache
-          az afd endpoint purge \
-            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
-            --profile-name  "${{ secrets.AZURE_CDN_PROFILE_NAME }}" \
-            --endpoint-name "${{ secrets.AZURE_CDN_ENDPOINT }}" \
-            --content-paths '/*'
-
-    - name: Display deployment info
-      run: |
-        echo "🎉 Deployment completed successfully!"
-        echo "📝 Files uploaded to storage account: ${{ secrets.AZURE_STORAGE_ACCOUNT }}"
-        echo "🌐 Your resume should now be available at your static website URL"
+      # Skipped unless a Front Door / CDN profile is actually configured.
+      - name: Purge Azure Front Door cache
+        if: ${{ secrets.AZURE_CDN_PROFILE_NAME != '' }}
+        uses: azure/cli@v2
+        with:
+          inlineScript: |
+            az config set extension.use_dynamic_install=yes_without_prompt
+            az afd endpoint purge \
+              --resource-group "${{ secrets.AZURE_RESOURCE_GROUP }}" \
+              --profile-name  "${{ secrets.AZURE_CDN_PROFILE_NAME }}" \
+              --endpoint-name "${{ secrets.AZURE_CDN_ENDPOINT }}" \
+              --content-paths '/*'
