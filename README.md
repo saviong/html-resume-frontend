@@ -36,17 +36,44 @@ flowchart LR
 Everything the browser needs is same-origin: the page and `/api` are served from the same
 hostname, so there are no CORS preflights and no separate API domain to manage.
 
-### Deployment flow
+### CI/CD flow
+
+A push to **either** repo deploys. Static Web Apps publishes the static content and
+the managed API as one atomic upload, so there is no API-only deploy — every change
+republishes both halves. `deploy-swa.yml` is therefore the single deploy definition,
+and the backend calls it rather than duplicating it.
 
 ```mermaid
-flowchart LR
-    A["push to master<br/><i>html-resume-frontend</i>"] --> B["GitHub Actions"]
-    C["html-resume-backend<br/><i>checked out into api/</i>"] -.-> B
-    B --> D["Stage _site/ + api/"]
-    D --> E["Guard:<br/>reject secrets & .git"]
-    E --> F["Azure/static-web-apps-deploy"]
-    F --> G["Static Web App"]
+flowchart TD
+    PF["push to master<br/><b>html-resume-frontend</b>"]
+    PB["push to master<br/><b>html-resume-backend</b>"]
+    PR["pull request<br/><i>either repo</i>"]
+    MAN["Actions tab<br/><i>workflow_dispatch</i>"]
+
+    subgraph WF["deploy-swa.yml · single deploy definition"]
+        CO["Check out BOTH repos<br/><i>persist-credentials: false</i>"]
+        T["Run API unit tests<br/><i>deploy gate</i>"]
+        ST["Stage _site/ + api/<br/><i>explicit allow-list</i>"]
+        G["Guard: reject .git,<br/>secrets, local.settings.json"]
+        DEP["Azure/static-web-apps-deploy"]
+        CO --> T --> ST --> G --> DEP
+    end
+
+    SWA["Azure Static Web App<br/><i>mycv.saviong.com</i>"]
+    TESTS["Unit tests only<br/><i>nothing deployed</i>"]
+
+    PF --> CO
+    PB -->|"workflow_call"| CO
+    MAN --> CO
+    PR --> TESTS
+    DEP --> SWA
+
+    style WF stroke-dasharray: 4 3
 ```
+
+Both repos are public, so the backend invokes this workflow directly with
+`uses: saviong/html-resume-frontend/.github/workflows/deploy-swa.yml@master` —
+no cross-repo personal access token is involved.
 
 ---
 
@@ -67,19 +94,28 @@ flowchart LR
 
 ## 🚀 Deployment
 
-`.github/workflows/deploy-swa.yml` runs on push to `master`:
+`.github/workflows/deploy-swa.yml` is the only thing that deploys. It triggers on
+`push` to `master` here, on `workflow_call` from the backend repo, and on manual
+`workflow_dispatch`. Each run:
 
-1. Checks out this repo and `html-resume-backend` (into `api/`), both with
-   `persist-credentials: false` so no token is ever written to disk.
-2. Stages **only** `index.html`, `staticwebapp.config.json` and `pic/` into `_site/`,
+1. Checks out **both** repos, each naming its `repository:` explicitly — when the
+   backend calls this workflow the default checkout target would be the backend,
+   not the site. Both use `persist-credentials: false` so no token is written to disk.
+2. Runs the API's unit tests as a deploy gate. Without this a frontend push would
+   deploy backend code that nothing had tested.
+3. Stages **only** `index.html`, `staticwebapp.config.json` and `pic/` into `_site/`,
    and only the three files the Functions host needs into `api/`.
-3. Runs a guard that fails the build if anything sensitive (a `.git` directory,
+4. Runs a guard that fails the build if anything sensitive (a `.git` directory,
    `local.settings.json`, or a credential-shaped string) reached the staged output.
-4. Deploys with `Azure/static-web-apps-deploy`. Oryx installs `api/requirements.txt`
+5. Deploys with `Azure/static-web-apps-deploy`. Oryx installs `api/requirements.txt`
    during the deploy.
 
-A backend-only change does not trigger this workflow — run it manually from
-**Actions → Deploy to Azure Static Web Apps → Run workflow** after merging there.
+`concurrency: swa-production` queues overlapping runs rather than letting two
+uploads race.
+
+> A push to either repo publishes `master` of **both**. If you have unpushed
+> frontend work, a backend push will not include it — that is inherent to the
+> atomic upload, not something the pipeline can work around.
 
 ### Required secret
 
