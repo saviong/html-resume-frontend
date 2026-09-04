@@ -110,8 +110,11 @@ no cross-repo personal access token is involved.
 5. Deploys with `Azure/static-web-apps-deploy`. Oryx installs `api/requirements.txt`
    during the deploy.
 
-`concurrency: swa-production` queues overlapping runs rather than letting two
-uploads race.
+`concurrency: swa-production` queues overlapping runs — but only within a single
+repository, since concurrency groups are not shared across repos. Pushing to both
+repos at once therefore still produces two runs that race on the same Static Web
+App, and the loser fails with *"No matching Static Web App environment was found"*.
+The deploy step retries once after 60s to absorb that.
 
 > A push to either repo publishes `master` of **both**. If you have unpushed
 > frontend work, a backend push will not include it — that is inherent to the
