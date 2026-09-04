@@ -33,23 +33,15 @@ jobs:
           find _site -name '.DS_Store' -delete
 
       # Only what the Functions host needs: no tests, ARM templates or Archive/.
+      # Oryx installs requirements.txt during the deploy. If those deps ever fail
+      # to land, the Python worker cannot import them, no functions are indexed,
+      # and /api/* returns a bare 404 with no error surfaced anywhere.
+      # (The local `swa deploy` CLI skips Oryx, so it needs deps vendored into
+      #  api/.python_packages/lib/site-packages instead.)
       - name: Stage API
         run: |
           mkdir -p api
           cp backend/function_app.py backend/host.json backend/requirements.txt api/
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      # Vendor dependencies explicitly rather than relying on the Oryx build step.
-      # Without them the worker fails to import and no functions are indexed,
-      # which surfaces only as a 404 on /api/* with no error anywhere.
-      - name: Vendor API dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r api/requirements.txt --target="api/.python_packages/lib/site-packages"
-          find api -name '__pycache__' -type d -prune -exec rm -rf {} + || true
 
       - name: Deploy
         uses: Azure/static-web-apps-deploy@v1
@@ -59,4 +51,3 @@ jobs:
           app_location: '_site'
           api_location: 'api'
           skip_app_build: true
-          skip_api_build: true
