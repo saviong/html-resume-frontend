@@ -17,6 +17,11 @@ jobs:
     steps:
       - name: Checkout frontend
         uses: actions/checkout@v4
+        with:
+          # Never write the Actions token into .git/config. A previous workflow
+          # uploaded the whole repo, .git included, to a public container, which
+          # published a live GITHUB_TOKEN on every deploy.
+          persist-credentials: false
 
       - name: Checkout backend into api/
         uses: actions/checkout@v4
@@ -24,6 +29,7 @@ jobs:
           repository: saviong/html-resume-backend
           ref: master
           path: backend
+          persist-credentials: false
 
       - name: Stage site files
         run: |
@@ -42,6 +48,24 @@ jobs:
         run: |
           mkdir -p api
           cp backend/function_app.py backend/host.json backend/requirements.txt api/
+
+      # Belt and braces: fail loudly rather than publish anything sensitive.
+      - name: Verify nothing sensitive is staged
+        run: |
+          fail=0
+          for d in _site api; do
+            while IFS= read -r f; do
+              case "$f" in
+                */.git/*|*/.git|*/.github/*|*.pem|*.key|*local.settings.json|*/.env|*.DS_Store)
+                  echo "::error::refusing to deploy sensitive path: $f"; fail=1 ;;
+              esac
+            done < <(find "$d" -mindepth 1)
+          done
+          if grep -rIlE '(ghp_|ghs_|github_pat_)[A-Za-z0-9]{20,}|AccountKey=[A-Za-z0-9+/=]{40,}' _site api 2>/dev/null | grep -q .; then
+            echo "::error::credential-shaped string found in staged output"; fail=1
+          fi
+          [ "$fail" -eq 0 ] && echo "staged output is clean"
+          exit "$fail"
 
       - name: Deploy
         uses: Azure/static-web-apps-deploy@v1
