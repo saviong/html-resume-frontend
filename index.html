@@ -1063,7 +1063,19 @@
         display: none !important;
       }
 
-      /* Force single page — no breaks, no overflow beyond 1 page */
+      /* ── Single-page fit ──────────────────────────────────────────
+         The résumé is taller than one A4 page, so it is scaled down as a
+         whole rather than clipped. Only --print-scale needs adjusting if
+         content is added or removed; lower fits more, higher reads larger.
+
+         Previously html/body were pinned to height:297mm, which ignored the
+         @page margins (leaving 6mm less usable) and relied on overflow:hidden
+         to clip. Overflow does not clip in paged media, so the excess simply
+         paginated and produced a near-empty second page. */
+      :root {
+        --print-scale: 0.95;
+      }
+
       * {
         break-inside: auto !important;
       }
@@ -1076,20 +1088,16 @@
         break-inside: avoid !important;
       }
 
-      html {
-        height: 297mm !important;
-        max-height: 297mm !important;
-        overflow: hidden !important;
-      }
-
+      html,
       body {
-        height: 297mm !important;
-        max-height: 297mm !important;
-        overflow: hidden !important;
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
       }
 
       .page-wrapper {
-        overflow: hidden !important;
+        zoom: var(--print-scale);
+        overflow: visible !important;
       }
 
       /* Force light theme for printing regardless of current theme */
