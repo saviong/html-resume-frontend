@@ -1,35 +1,69 @@
-# Deploys the résumé to Azure Static Web Apps (Free plan):
-# managed TLS on mycv.saviong.com, global CDN, and the Python API on /api.
+# Single deployment path for the résumé site and its API.
 #
-# The API lives in a separate repo, so it is checked out into api/ here.
-# A backend-only change does not trigger this workflow — run it manually
-# (Actions -> Deploy to Azure Static Web Apps -> Run workflow) after merging there.
+# Azure Static Web Apps uploads the static content and the managed Functions API
+# as one atomic deployment -- there is no API-only deploy -- so a change in
+# either repo has to publish both halves together. This workflow is therefore
+# the one place that knows how to deploy, and it runs in three situations:
+#
+#   push               a commit lands on master here (frontend change)
+#   workflow_call      html-resume-backend calls it after a backend change
+#   workflow_dispatch  manual re-deploy from the Actions tab
+#
+# Both repos are public, so the backend can call this directly with
+# `uses: saviong/html-resume-frontend/.github/workflows/deploy-swa.yml@master`
+# and no cross-repo personal access token is needed.
 name: Deploy to Azure Static Web Apps
 
 on:
   push:
     branches: [master]
   workflow_dispatch:
+  workflow_call:
+    secrets:
+      AZURE_STATIC_WEB_APPS_API_TOKEN:
+        required: true
+
+# Queue overlapping deploys rather than letting two uploads race.
+concurrency:
+  group: swa-production
+  cancel-in-progress: false
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
+      # Both checkouts name their repository explicitly: when the backend calls
+      # this workflow, the default checkout target would be the backend.
       - name: Checkout frontend
         uses: actions/checkout@v4
         with:
+          repository: saviong/html-resume-frontend
+          ref: master
           # Never write the Actions token into .git/config. A previous workflow
           # uploaded the whole repo, .git included, to a public container, which
           # published a live GITHUB_TOKEN on every deploy.
           persist-credentials: false
 
-      - name: Checkout backend into api/
+      - name: Checkout backend
         uses: actions/checkout@v4
         with:
           repository: saviong/html-resume-backend
           ref: master
           path: backend
           persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: 'backend/.python_version'
+
+      # Gate the deploy on the API's own tests. This protects both entry points:
+      # a frontend push deploys backend code it never otherwise tested.
+      - name: Test API
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m unittest test -v
 
       - name: Stage site files
         run: |
@@ -75,3 +109,15 @@ jobs:
           app_location: '_site'
           api_location: 'api'
           skip_app_build: true
+
+      - name: Summary
+        run: |
+          {
+            echo "### Deployed to Azure Static Web Apps"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Triggered by | \`${{ github.event_name }}\` in \`${{ github.repository }}\` |"
+            echo "| Site | https://mycv.saviong.com |"
+            echo "| API  | https://mycv.saviong.com/api/updateCounter |"
+          } >> "$GITHUB_STEP_SUMMARY"
