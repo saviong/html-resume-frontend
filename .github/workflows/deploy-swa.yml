@@ -1,18 +1,14 @@
-# Migration target: Azure Static Web Apps (Free plan).
-# Replaces the Blob Storage + Front Door setup with free managed TLS on
-# mycv.saviong.com and a same-origin /api route, at no monthly cost.
+# Deploys the résumé to Azure Static Web Apps (Free plan):
+# managed TLS on mycv.saviong.com, global CDN, and the Python API on /api.
 #
-# Before the first run:
-#   1. Create the Static Web App (Free plan) and add its deployment token as
-#      the AZURE_STATIC_WEB_APPS_API_TOKEN repository secret.
-#   2. Set COSMOS_CONNECTION_STRING and TABLE_NAME in the Static Web App's
-#      application settings (not on the old Function App).
-#   3. Point the mycv CNAME at the Static Web App hostname and add the custom domain.
-#
-# Once this is green, delete deploy.yml and decommission resumevisitor-fn.
+# The API lives in a separate repo, so it is checked out into api/ here.
+# A backend-only change does not trigger this workflow — run it manually
+# (Actions -> Deploy to Azure Static Web Apps -> Run workflow) after merging there.
 name: Deploy to Azure Static Web Apps
 
 on:
+  push:
+    branches: [master]
   workflow_dispatch:
 
 jobs:
@@ -22,13 +18,12 @@ jobs:
       - name: Checkout frontend
         uses: actions/checkout@v4
 
-      # The API lives in a separate repo, so pull it in as the api/ folder.
       - name: Checkout backend into api/
         uses: actions/checkout@v4
         with:
           repository: saviong/html-resume-backend
           ref: master
-          path: api
+          path: backend
 
       - name: Stage site files
         run: |
@@ -37,7 +32,26 @@ jobs:
           cp -r pic _site/
           find _site -name '.DS_Store' -delete
 
-      - name: Build and deploy
+      # Only what the Functions host needs: no tests, ARM templates or Archive/.
+      - name: Stage API
+        run: |
+          mkdir -p api
+          cp backend/function_app.py backend/host.json backend/requirements.txt api/
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Vendor dependencies explicitly rather than relying on the Oryx build step.
+      # Without them the worker fails to import and no functions are indexed,
+      # which surfaces only as a 404 on /api/* with no error anywhere.
+      - name: Vendor API dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r api/requirements.txt --target="api/.python_packages/lib/site-packages"
+          find api -name '__pycache__' -type d -prune -exec rm -rf {} + || true
+
+      - name: Deploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
@@ -45,3 +59,4 @@ jobs:
           app_location: '_site'
           api_location: 'api'
           skip_app_build: true
+          skip_api_build: true

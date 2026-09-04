@@ -1,8 +1,8 @@
-name: Deploy Frontend Resume to Azure Blob
+# Superseded by deploy-swa.yml. Retained only to redeploy the old Blob Storage
+# site during cutover; safe to delete once Static Web Apps is confirmed good.
+name: Deploy Frontend Resume to Azure Blob (retired)
 
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
 
 jobs:
